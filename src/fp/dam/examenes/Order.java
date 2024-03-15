@@ -1,6 +1,9 @@
 package fp.dam.examenes;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
 import java.util.Objects;
 
 public class Order {
@@ -12,9 +15,10 @@ public class Order {
 	private String status;
 	private String comments;
 	private int customerNumber;
+	private List<OrderDetail> orderDetails;
 	
 	public Order(int orderNumber, LocalDate orderDate, LocalDate requiredDate, LocalDate shippedDate, String status,
-			String comments, int customerNumber) {
+            String comments, int customerNumber) {
 		this.orderNumber = orderNumber;
 		this.orderDate = orderDate;
 		this.requiredDate = requiredDate;
@@ -22,7 +26,18 @@ public class Order {
 		this.status = status;
 		this.comments = comments;
 		this.customerNumber = customerNumber;
+		orderDetails = new ArrayList<>();
 	}
+	public void addOrderDetail(OrderDetail orderDetail) {
+        orderDetails.add(orderDetail);
+        orderDetails.sort(Comparator.comparing(OrderDetail::getPriceEach)
+                                    .thenComparing(OrderDetail::getProductCode));
+    }
+	
+	public double calcularImporteTotal() {
+	    return orderDetails.stream().mapToDouble(OrderDetail::getPriceEach).sum();
+	}
+
 	
 	public Order(String csvLine) {
 		String [] tokens = csvLine.split("\\|");
